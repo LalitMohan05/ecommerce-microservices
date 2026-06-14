@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: auth-service
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/authdb
+    username: lalit
+    password: password
+
+  jpa:
+    database: PostgreSQL
+    show-sql: true
+
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+jwt:
+  secret: bTZhKzZ2O3syIWNhfTBtLXZkdF5saHM1bDlgdmpkPzRzamw=
+
+
+server:
+  port: 8084
+
+eureka:
+  client:
+    service-url:
+      defaultZone:
+        http://localhost:8761/eureka/
+
+
