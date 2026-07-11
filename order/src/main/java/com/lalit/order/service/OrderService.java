@@ -1,6 +1,7 @@
 package com.lalit.order.service;
 
 import com.lalit.order.client.ProductClient;
+import com.lalit.order.exceptions.OrderIdNotFoundException;
 import lombok.RequiredArgsConstructor;
 import com.lalit.order.dto.OrderItemDTO;
 import com.lalit.order.dto.OrderResponse;
@@ -101,5 +102,19 @@ public class OrderService {
                                 .toList(),
                 savedOrder.getCreatedAt()
                 );
+    }
+
+    public OrderResponse updateOrderStatus(Long orderId, OrderStatus status) {
+         java.util.Optional<Order> optOrderResponse = orderRepo.findById(orderId);
+
+         if(optOrderResponse.isPresent()){
+             Order order = optOrderResponse.get();
+             order.setStatus(status);
+             Order updatedOrder = orderRepo.save(order);
+             return mapToOrderResponse(updatedOrder);
+         }
+         else{
+             throw  new OrderIdNotFoundException("No order found with this id:" + orderId);
+         }
     }
 }
