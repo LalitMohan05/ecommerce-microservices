@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/orders")
@@ -31,5 +33,12 @@ public class OrderController {
             @RequestBody UpdateOrderStatusRequest orderStatus
             ){
         return ResponseEntity.ok(orderService.updateOrderStatus(OrderId,orderStatus.getStatus()));
+    }
+
+    @PostMapping("/orderHistory")
+    public ResponseEntity<List<OrderResponse>> createOrderHistory(
+            @RequestHeader("X-User-ID") Long userId
+    ){
+        return ResponseEntity.ok(orderService.orderHistory(userId));
     }
 }

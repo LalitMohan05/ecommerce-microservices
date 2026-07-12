@@ -117,4 +117,11 @@ public class OrderService {
              throw  new OrderIdNotFoundException("No order found with this id:" + orderId);
          }
     }
+
+    public List<OrderResponse> orderHistory(Long userId) {
+        return orderRepo.findByUserId(userId)
+                .stream()
+                .map(this::mapToOrderResponse)
+                .toList();
+    }
 }
