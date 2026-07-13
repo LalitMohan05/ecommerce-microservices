@@ -39,6 +39,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
             String email= jwtService.extractEmail(token);
             String role= jwtService.extractRole(token);
+            Long userId= jwtService.extractUserId(token);
 
             List<SimpleGrantedAuthority> authorities =
                     List.of(
@@ -50,10 +51,11 @@ public class JwtFilter extends OncePerRequestFilter {
             UsernamePasswordAuthenticationToken authToken =
 
                     new UsernamePasswordAuthenticationToken(
-                            email,
+                            new UserPrincipal(userId,email,role),
                             null,
                             authorities
                     );
+
 
             authToken.setDetails(
                     new WebAuthenticationDetailsSource()
