@@ -5,12 +5,12 @@ import com.lalit.user.dto.UserRequest;
 import com.lalit.user.dto.UserResponse;
 import com.lalit.user.entity.Address;
 import com.lalit.user.entity.User;
+import com.lalit.user.exceptions.UserNotFoundException;
 import com.lalit.user.repository.UserRepo;
 import org.springframework.stereotype.Service;
 
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,7 +30,6 @@ public class UserService {
     }
 
     public void addUser(UserRequest userRequest){
-//        user.setId(count++);
         User user = new User();
         updateUserFromRequest(user,userRequest);
         userRepo.save(user);
@@ -38,32 +37,19 @@ public class UserService {
 
 
 
-    public Optional<UserResponse> getById(Long id) {
-//        return userList.stream()
-//                .filter(user -> user.getId().equals(id))
-//                .findFirst();
-
-        return userRepo.findById(id)
-                .map(this::mapToUserResponse);
+    public UserResponse getById(Long id) {
+        User user = userRepo.findById(id)
+                .orElseThrow(()-> new UserNotFoundException("User not found with id : "+id));
+        return (mapToUserResponse(user));
     }
 
-    public boolean updateUser(Long id, UserRequest updateduserRequest) {
-//        return userList.stream()
-//                .filter(user -> user.getId().equals(id))
-//                .findFirst()
-//                .map(existing -> {
-//                    existing.setFirstName(updateduser.getFirstName());
-//                    existing.setLastName(updateduser.getLastName());
-//                    return true;
-//                })
-//                .orElse(false);
+    public UserResponse updateUser(Long id, UserRequest updateduserRequest) {
+        User existing= userRepo.findById(id)
+                .orElseThrow(()-> new UserNotFoundException("User not found with id : "+id));
+        updateUserFromRequest(existing,updateduserRequest);
+        User savedUser = userRepo.save(existing);
 
-        return userRepo.findById(id)
-                .map(existing -> {
-                    updateUserFromRequest(existing,updateduserRequest);
-                    userRepo.save(existing);
-                    return true;
-                }).orElse(false);
+        return mapToUserResponse(savedUser);
     }
 
     private void updateUserFromRequest(User user, UserRequest userRequest) {
@@ -90,9 +76,7 @@ public class UserService {
         response.setId(String.valueOf(user.getId()));
         response.setFirstName(user.getFirstName());
         response.setLastName(user.getLastName());
-//        response.setEmail(user.getEmail());
         response.setPhone(user.getPhone());
-//        response.setRole(user.getRole());
 
         if(user.getAddress() != null){
             AddressDTO addressDTO = new AddressDTO();

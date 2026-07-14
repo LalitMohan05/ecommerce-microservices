@@ -1,5 +1,7 @@
 package com.lalit.product.service;
 
+import com.lalit.product.exceptions.InsufficientStockException;
+import com.lalit.product.exceptions.ProductNotFoundException;
 import lombok.RequiredArgsConstructor;
 import com.lalit.product.dto.ProductRequest;
 import com.lalit.product.dto.ProductResponse;
@@ -8,7 +10,6 @@ import com.lalit.product.repository.ProductRepo;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,13 +48,12 @@ public class ProductService {
         product.setQuantity(productRequest.getQuantity());
     }
 
-    public Optional<ProductResponse> updateProduct(Long id, ProductRequest productRequest) {
-        return productRepo.findById(id)
-                .map(existingProduct -> {
-                    updateProductFromRequest(existingProduct, productRequest);
-                    Product savedProduct = productRepo.save(existingProduct);
-                    return mapToProductResponse(savedProduct);
-                });
+    public ProductResponse updateProduct(Long id, ProductRequest productRequest) {
+        Product existingProduct = productRepo.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException("Product not found with id : "+id));
+        updateProductFromRequest(existingProduct, productRequest);
+        Product savedProduct = productRepo.save(existingProduct);
+        return mapToProductResponse(savedProduct);
     }
 
     public List<ProductResponse> fetchAllProduct() {
@@ -62,9 +62,10 @@ public class ProductService {
                 .collect(Collectors.toList());
     }
 
-    public Optional<ProductResponse> fetchProductById(Long id) {
-        return productRepo.findById(id)
-                .map(this::mapToProductResponse);
+    public ProductResponse fetchProductById(Long id) {
+        Product product = productRepo.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException("Product not found with id : "+id));
+        return mapToProductResponse(product);
 
     }
 
@@ -74,7 +75,7 @@ public class ProductService {
                    product.setActive(false);
                    productRepo.save(product);
                    return true;
-               }).orElse(false);
+               }).orElseThrow(() -> new ProductNotFoundException("Product not found with id : "+id));
 
     }
 
@@ -88,11 +89,11 @@ public class ProductService {
 
         Product product= productRepo.findById(id)
                 .orElseThrow(()->
-                        new RuntimeException("Product not found"));
+                        new ProductNotFoundException("Product not found with id : "+id));
 
         if(product.getQuantity()<quantity){
-            throw new RuntimeException(
-                    "Insufficient stock for product" +
+            throw new InsufficientStockException(
+                    "Only "+product.getQuantity() +" units available for product: "+
                             product.getName()
             );
         }

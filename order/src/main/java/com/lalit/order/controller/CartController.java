@@ -1,8 +1,6 @@
 package com.lalit.order.controller;
 
-import com.lalit.order.security.JwtService;
 import com.lalit.order.security.UserPrincipal;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import com.lalit.order.dto.CartItemRequest;
 import com.lalit.order.service.CartService;
@@ -20,23 +18,18 @@ import java.util.List;
 public class CartController {
 
     private final CartService cartService;
-    private final JwtService jwtService;
 
     @PostMapping("/addToCart")
     public ResponseEntity<String> addToCart(
             Authentication authentication,
-            @RequestBody CartItemRequest Cartrequest){
+            @RequestBody CartItemRequest CartRequest){
 
         UserPrincipal principal =
                 (UserPrincipal) authentication.getPrincipal();
 
         Long userId = principal.userId();
 
-        if(!cartService.addToCart(userId, Cartrequest)){
-            return  ResponseEntity.badRequest().body("Product out of stock/User not found/User not found" );
-        }
-
-//        cartService.addToCart(userId , request);
+        cartService.addToCart(userId, CartRequest);
         return ResponseEntity.status(HttpStatus.CREATED).build();
 
     }
@@ -50,8 +43,8 @@ public class CartController {
                 (UserPrincipal) authentication.getPrincipal();
 
         Long userId = principal.userId();
-        boolean deleted= cartService.deleteFromCart(userId,productId);
-        return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+        cartService.deleteFromCart(userId,productId);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/allCart")

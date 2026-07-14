@@ -1,6 +1,7 @@
 package com.lalit.order.service;
 
 import com.lalit.order.client.ProductClient;
+import com.lalit.order.exceptions.CartEmptyException;
 import com.lalit.order.exceptions.OrderIdNotFoundException;
 import lombok.RequiredArgsConstructor;
 import com.lalit.order.dto.OrderItemDTO;
@@ -8,39 +9,31 @@ import com.lalit.order.dto.OrderResponse;
 import com.lalit.order.entity.CartItem;
 import com.lalit.order.entity.Order;
 import com.lalit.order.entity.OrderItem;
-//import com.lalit.order.entity.User;
 import com.lalit.order.enums.OrderStatus;
 import com.lalit.order.repository.OrderRepo;
-//import com.lalit.order.repository.UserRepo;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class OrderService {
 
     private  final CartService cartService;
-//    private final UserRepo userRepo;
     private final OrderRepo orderRepo;
 
     private final ProductClient productClient;
 
-    public Optional<OrderResponse> createOrder(Long userId) {
+    public OrderResponse createOrder(Long userId) {
         //validating for cart Items
         List<CartItem> cartItems = cartService.fetchCartItems(userId);
         if (cartItems.isEmpty()){
-            return Optional.empty();
+            throw new CartEmptyException(
+                    "Cannot create order, cart is empty for userId : " + userId
+            );
         }
         //validate for user
-//        Optional<User> userOptional = userRepo.findById(Long.valueOf(userId));
-//        if(userOptional.isEmpty()){
-//            return Optional.empty();
-//        }
-//        User user = userOptional.get();
-        //calculate total price
         BigDecimal totalPrice = cartItems.stream()
                 .map(item ->
                         item.getPrice().multiply(
@@ -80,7 +73,7 @@ public class OrderService {
         //clear the cart
         cartService.clearCart(userId);
 
-        return Optional.of(mapToOrderResponse(savedOrder));
+        return mapToOrderResponse(savedOrder);
 
     }
 

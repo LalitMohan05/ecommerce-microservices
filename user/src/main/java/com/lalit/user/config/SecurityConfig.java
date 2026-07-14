@@ -1,7 +1,6 @@
 package com.lalit.user.config;
 
 import com.lalit.user.security.JwtFilter;
-import jakarta.servlet.http.HttpServlet;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

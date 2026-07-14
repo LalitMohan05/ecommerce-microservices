@@ -7,6 +7,8 @@ import com.lalit.auth.dto.RegisterRequest;
 import com.lalit.auth.dto.UserRequest;
 import com.lalit.auth.entity.AuthUser;
 import com.lalit.auth.enums.Role;
+import com.lalit.auth.exceptions.EmailAlreadyInUseException;
+import com.lalit.auth.exceptions.InvalidCredentialsException;
 import com.lalit.auth.repository.AuthRepo;
 import com.lalit.auth.security.JwtService;
 import lombok.RequiredArgsConstructor;
@@ -28,8 +30,8 @@ public class AuthService {
                 .isPresent();
 
         if(exists){
-            throw new RuntimeException(
-                    "Email already exists"
+            throw new EmailAlreadyInUseException(
+                    "This Email("+request.getEmail() +") is already in use"
             );
         }
 
@@ -65,7 +67,7 @@ public class AuthService {
         AuthUser user=authRepo
                 .findByEmail(request.getEmail())
                 .orElseThrow(()->
-                        new RuntimeException("User not found")
+                        new InvalidCredentialsException("Invalid credentials")
                 );
 
         boolean matches = passwordEncoder.matches(
@@ -74,7 +76,7 @@ public class AuthService {
         );
 
         if(!matches){
-            throw new RuntimeException("Invalid credentials"
+            throw new InvalidCredentialsException("Invalid credentials"
             );
         }
 

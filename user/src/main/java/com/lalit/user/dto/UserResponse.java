@@ -1,7 +1,6 @@
 package com.lalit.user.dto;
 
 import lombok.Data;
-import com.lalit.user.enums.UserRole;
 
 @Data
 public class UserResponse {

@@ -1,10 +1,7 @@
 package com.lalit.order.controller;
 
 import com.lalit.order.dto.UpdateOrderStatusRequest;
-import com.lalit.order.enums.OrderStatus;
-import com.lalit.order.security.JwtService;
 import com.lalit.order.security.UserPrincipal;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import com.lalit.order.dto.OrderResponse;
 import com.lalit.order.service.OrderService;
@@ -21,7 +18,6 @@ import java.util.List;
 public class OrderController {
 
     private final OrderService orderService;
-    private final JwtService  jwtService;
 
     @PostMapping
     public ResponseEntity<OrderResponse> createOrder(
@@ -32,20 +28,20 @@ public class OrderController {
 
         Long userId = principal.userId();
 
-        return orderService.createOrder(userId)
-                .map(orderResponse -> new ResponseEntity<>(orderResponse,HttpStatus.CREATED))
-                .orElseGet(()->ResponseEntity.badRequest().build());
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(orderService.createOrder(userId));
     }
 
     @PutMapping("/{OrderId}/status")
     public ResponseEntity<OrderResponse> updateOrderStatus(
-            @PathVariable Long OrderId,
+            @PathVariable Long orderId,
             @RequestBody UpdateOrderStatusRequest orderStatus
             ){
-        return ResponseEntity.ok(orderService.updateOrderStatus(OrderId,orderStatus.getStatus()));
+        return ResponseEntity.ok(orderService.updateOrderStatus(orderId,orderStatus.getStatus()));
     }
 
-    @PostMapping("/orderHistory")
+    @GetMapping("/my-orders")
     public ResponseEntity<List<OrderResponse>> createOrderHistory(
             Authentication authentication
     ){
