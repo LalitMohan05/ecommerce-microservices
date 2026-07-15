@@ -7,6 +7,7 @@ import com.lalit.user.entity.Address;
 import com.lalit.user.entity.User;
 import com.lalit.user.exceptions.UserNotFoundException;
 import com.lalit.user.repository.UserRepo;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 
@@ -14,13 +15,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
     private final UserRepo userRepo;
 
-    public UserService(UserRepo userRepo) {
-        this.userRepo = userRepo;
-    }
 
     public List<UserResponse> fetchALlUser(){
         List<User> userList = userRepo.findAll();
@@ -29,10 +28,11 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    public void addUser(UserRequest userRequest){
+    public UserResponse addUser(UserRequest userRequest){
         User user = new User();
         updateUserFromRequest(user,userRequest);
-        userRepo.save(user);
+        User saved= userRepo.save(user);
+        return mapToUserResponse(saved);
     }
 
 
@@ -52,11 +52,23 @@ public class UserService {
         return mapToUserResponse(savedUser);
     }
 
+    public void deleteUser(Long id){
+
+        User user = userRepo.findById(id)
+                .orElseThrow(() ->
+                        new UserNotFoundException(
+                                "User not found with id : " + id
+                        )
+                );
+
+        userRepo.delete(user);
+    }
+
     private void updateUserFromRequest(User user, UserRequest userRequest) {
         user.setFirstName(userRequest.getFirstName());
         user.setLastName(userRequest.getLastName());
         user.setPhone(userRequest.getPhone());
-        user.setAuthUserId(user.getAuthUserId());
+        user.setAuthUserId(userRequest.getAuthUserId());
 
         if(userRequest.getAddress() != null){
             Address address = new Address();

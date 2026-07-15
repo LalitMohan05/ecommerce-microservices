@@ -4,20 +4,21 @@ package com.lalit.user.controller;
 import com.lalit.user.dto.UserRequest;
 import com.lalit.user.dto.UserResponse;
 import com.lalit.user.service.UserService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/users")
 public class UserController {
 
-    private UserService userService;
+    private final UserService userService;
 
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
 
     @GetMapping()
     public ResponseEntity<List<UserResponse>> getAllUser(){
@@ -25,9 +26,9 @@ public class UserController {
     }
 
     @PostMapping()
-    public ResponseEntity<String> createUser(@RequestBody UserRequest userRequest){
-        userService.addUser(userRequest);
-        return ResponseEntity.ok("User added successfully");
+    public ResponseEntity<UserResponse> createUser(@Valid @RequestBody UserRequest userRequest){
+        UserResponse user =userService.addUser(userRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
 
     @GetMapping("/{id}")
@@ -38,8 +39,17 @@ public class UserController {
 
     @PutMapping("/update/{id}")
     public ResponseEntity<UserResponse> updateUser(@PathVariable Long id,
-                                              @RequestBody UserRequest updateUserRequest){
+                                              @Valid @RequestBody UserRequest updateUserRequest){
         return ResponseEntity.ok(userService.updateUser(id,updateUserRequest));
 
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteUser(
+            @PathVariable Long id
+    ){
+        userService.deleteUser(id);
+
+        return ResponseEntity.noContent().build();
     }
 }

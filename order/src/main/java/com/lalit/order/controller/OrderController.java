@@ -2,6 +2,7 @@ package com.lalit.order.controller;
 
 import com.lalit.order.dto.UpdateOrderStatusRequest;
 import com.lalit.order.security.UserPrincipal;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import com.lalit.order.dto.OrderResponse;
 import com.lalit.order.service.OrderService;
@@ -33,10 +34,10 @@ public class OrderController {
                 .body(orderService.createOrder(userId));
     }
 
-    @PutMapping("/{OrderId}/status")
+    @PutMapping("/{orderId}/status")
     public ResponseEntity<OrderResponse> updateOrderStatus(
             @PathVariable Long orderId,
-            @RequestBody UpdateOrderStatusRequest orderStatus
+            @Valid @RequestBody UpdateOrderStatusRequest orderStatus
             ){
         return ResponseEntity.ok(orderService.updateOrderStatus(orderId,orderStatus.getStatus()));
     }

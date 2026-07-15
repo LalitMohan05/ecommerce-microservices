@@ -1,5 +1,6 @@
 package com.lalit.product.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import com.lalit.product.dto.ProductRequest;
 import com.lalit.product.dto.ProductResponse;
@@ -18,13 +19,13 @@ public class ProductController {
     private final ProductService productService;
 
     @PostMapping
-    public ResponseEntity<ProductResponse> createProduct(@RequestBody ProductRequest productRequest){
+    public ResponseEntity<ProductResponse> createProduct(@Valid @RequestBody ProductRequest productRequest){
         return new ResponseEntity<ProductResponse>(productService.createProduct(productRequest),
                 HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long id , @RequestBody ProductRequest productRequest){
+    public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long id ,@Valid @RequestBody ProductRequest productRequest){
         return ResponseEntity.ok(productService.updateProduct(id, productRequest));
     }
 
@@ -40,8 +41,8 @@ public class ProductController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id){
-        boolean deleted = productService.deleteProduct(id);
-        return deleted?ResponseEntity.noContent().build():ResponseEntity.notFound().build();
+        productService.deleteProduct(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/search")

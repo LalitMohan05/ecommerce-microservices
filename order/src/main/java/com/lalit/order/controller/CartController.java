@@ -1,6 +1,7 @@
 package com.lalit.order.controller;
 
 import com.lalit.order.security.UserPrincipal;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import com.lalit.order.dto.CartItemRequest;
 import com.lalit.order.service.CartService;
@@ -22,7 +23,7 @@ public class CartController {
     @PostMapping("/addToCart")
     public ResponseEntity<String> addToCart(
             Authentication authentication,
-            @RequestBody CartItemRequest CartRequest){
+            @Valid @RequestBody CartItemRequest CartRequest){
 
         UserPrincipal principal =
                 (UserPrincipal) authentication.getPrincipal();

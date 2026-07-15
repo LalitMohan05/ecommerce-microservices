@@ -50,7 +50,12 @@ public class ProductService {
 
     public ProductResponse updateProduct(Long id, ProductRequest productRequest) {
         Product existingProduct = productRepo.findById(id)
-                .orElseThrow(() -> new ProductNotFoundException("Product not found with id : "+id));
+                .filter(Product::getActive)
+                .orElseThrow(() ->
+                        new ProductNotFoundException(
+                                "Product not found with id : " + id
+                        )
+                );
         updateProductFromRequest(existingProduct, productRequest);
         Product savedProduct = productRepo.save(existingProduct);
         return mapToProductResponse(savedProduct);
@@ -64,18 +69,27 @@ public class ProductService {
 
     public ProductResponse fetchProductById(Long id) {
         Product product = productRepo.findById(id)
-                .orElseThrow(() -> new ProductNotFoundException("Product not found with id : "+id));
+                .filter(Product::getActive)
+                .orElseThrow(() ->
+                        new ProductNotFoundException(
+                                "Product not found with id : " + id
+                        )
+                );
         return mapToProductResponse(product);
 
     }
 
-    public boolean deleteProduct(Long id) {
-       return productRepo.findById(id)
-               .map(product -> {
-                   product.setActive(false);
-                   productRepo.save(product);
-                   return true;
-               }).orElseThrow(() -> new ProductNotFoundException("Product not found with id : "+id));
+    public void deleteProduct(Long id) {
+        Product product = productRepo.findById(id)
+                .orElseThrow(() ->
+                        new ProductNotFoundException(
+                                "Product not found with id : " + id
+                        )
+                );
+
+        product.setActive(false);
+
+        productRepo.save(product);
 
     }
 
@@ -87,10 +101,13 @@ public class ProductService {
 
     public void reduceStock(Long id, Integer quantity) {
 
-        Product product= productRepo.findById(id)
-                .orElseThrow(()->
-                        new ProductNotFoundException("Product not found with id : "+id));
-
+        Product product = productRepo.findById(id)
+                .filter(Product::getActive)
+                .orElseThrow(() ->
+                        new ProductNotFoundException(
+                                "Product not found with id : " + id
+                        )
+                );
         if(product.getQuantity()<quantity){
             throw new InsufficientStockException(
                     "Only "+product.getQuantity() +" units available for product: "+
