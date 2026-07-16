@@ -48,6 +48,12 @@
 				spring-cloud-starter-netflix-eureka-client
 			</artifactId>
 		</dependency>
+
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webflux-ui</artifactId>
+			<version>2.8.9</version>
+		</dependency>
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>

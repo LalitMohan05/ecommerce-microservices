@@ -28,7 +28,7 @@ public class ProductService {
         response.setId(savedProduct.getId());
         response.setName(savedProduct.getName());
         response.setActive(savedProduct.getActive());
-        response.setCatagory(savedProduct.getCategory());
+        response.setCategory(savedProduct.getCategory());
         response.setDescription(savedProduct.getDescription());
         response.setPrice(savedProduct.getPrice());
         response.setImageUrl(savedProduct.getImageUrl());
