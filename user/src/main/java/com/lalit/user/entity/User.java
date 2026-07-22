@@ -31,6 +31,9 @@ public class User {
     @Column(nullable = false, unique = true)
     private Long authUserId;
 
+    @Column(nullable = false,unique = true)
+    private String email;
+
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
     @JoinColumn(name = "address_id",referencedColumnName = "id")
     private Address address;

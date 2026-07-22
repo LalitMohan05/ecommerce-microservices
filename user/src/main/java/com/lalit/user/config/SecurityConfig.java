@@ -25,38 +25,27 @@ public class SecurityConfig {
                         )
                 )
 
-                .authorizeHttpRequests(auth->auth
+                .authorizeHttpRequests(auth -> auth
+
+                        // Swagger
                         .requestMatchers(
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui.html"
                         ).permitAll()
-                        //everyone
-                        .requestMatchers(
-                                HttpMethod.GET,
-                                "/api/users/**"
-                        )
+
+                        // Registration from Auth Service
+                        .requestMatchers(HttpMethod.POST, "/api/users")
                         .permitAll()
 
-                        .requestMatchers(
-                                HttpMethod.POST,
-                                "/api/users/**"
-                        )
-                        .permitAll()
-                        //admin
-
-                        .requestMatchers(
-                                HttpMethod.PUT,
-                                "/api/users/**"
-                        )
+                        // Admin only
+                        .requestMatchers(HttpMethod.GET, "/api/users")
                         .hasRole("ADMIN")
 
-                        .requestMatchers(
-                                HttpMethod.DELETE,
-                                "/api/users/**"
-                        )
+                        .requestMatchers(HttpMethod.DELETE, "/api/users/**")
                         .hasRole("ADMIN")
 
+                        // Everything else requires authentication
                         .anyRequest().authenticated()
                 )
 

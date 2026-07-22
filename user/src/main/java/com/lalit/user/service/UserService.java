@@ -69,6 +69,7 @@ public class UserService {
         user.setLastName(userRequest.getLastName());
         user.setPhone(userRequest.getPhone());
         user.setAuthUserId(userRequest.getAuthUserId());
+        user.setEmail(userRequest.getEmail());
 
         if(userRequest.getAddress() != null){
             Address address = new Address();
